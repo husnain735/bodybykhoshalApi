@@ -84,7 +84,7 @@ namespace bodybykhoshalApi.Service
                         return tokenString;
                     }
                 }
-                return "Email does not exist";
+                return "Email does not exist"; 
             }
             catch (Exception)
             {
