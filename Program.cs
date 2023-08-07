@@ -30,15 +30,6 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowOrigin", builder =>
-//    {
-//        builder.AllowAnyOrigin()
-//        .AllowAnyHeader()
-//               .AllowAnyMethod();
-//    });
-//});
 
 builder.Services.AddCors(options =>
 {
@@ -56,6 +47,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 
 builder.Services.AddScoped<IAuthenticationService,AuthenticationService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();

@@ -26,7 +26,7 @@ namespace bodybykhoshalApi.Controllers
         public IActionResult Login(LoginRequestHandler request)
         {
             var tokenString = _authenticationService.LoginUser(request);
-            return Ok(new { Token = tokenString });
+            return Ok(tokenString);
         }
         [HttpPost("RegisterUser")]
         public IActionResult RegisterUser(RegisterRequestHandler request)

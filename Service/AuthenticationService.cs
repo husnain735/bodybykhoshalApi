@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static bodybykhoshalApi.Models.ViewModel.HttpResponse;
 
 namespace bodybykhoshalApi.Service
 {
@@ -57,10 +58,12 @@ namespace bodybykhoshalApi.Service
                 throw;
             }
         }
-        public string LoginUser(LoginRequestHandler requestHandler)
+        public LoginResponseHandler LoginUser(LoginRequestHandler requestHandler)
         {
             try
             {
+                var response = new LoginResponseHandler();
+
                 var checkEmailExists = _dbContext.Users.Where(x => x.Email.Equals(requestHandler.Email)).FirstOrDefault();
 
                 if (checkEmailExists != null)
@@ -85,10 +88,14 @@ namespace bodybykhoshalApi.Service
                         };
                         var token = tokenHandler.CreateToken(tokenDescriptor);
                         var tokenString = tokenHandler.WriteToken(token);
-                        return tokenString;
+                        response.Token = tokenString;
+                        response.Success = true;
+                        response.RoleId = checkEmailExists.RoleId;
+                        return response;
                     }
                 }
-                return "Email does not exist"; 
+                response.Success = false;
+                return response; 
             }
             catch (Exception)
             {

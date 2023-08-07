@@ -76,7 +76,7 @@ namespace bodybykhoshalApi.Controllers
         public IActionResult saveChat(SaveChatRequestHandler request)
         {
             var userClaim = getClaims();
-            request.UserId = userClaim.UserGUID;
+            request.SenderOne = userClaim.UserGUID;
             var user = _homeService.SaveChat(request);
             return Ok(new { Success = user });
         }

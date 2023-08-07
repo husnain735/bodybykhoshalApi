@@ -49,19 +49,24 @@ namespace bodybykhoshalApi.Service
         {
             try
             {
+                var packages = new PackagesViewModel();
                 var cart = _dbContext.ShoppingCart.Where(x => x.UserId == userGuid).FirstOrDefault();
                 if (cart != null)
                 {
                     PackageId = Convert.ToInt32(cart.PackageId);
                 }
-                var packages = _dbContext.Packages.Where(x => x.PackagesId == PackageId).Select(x => new PackagesViewModel
+                if (PackageId == 0 && cart == null)
+                {
+                    return packages;
+                }
+                packages = _dbContext.Packages.Where(x => x.PackagesId == PackageId).Select(x => new PackagesViewModel
                 {
                     Description = x.Description,
                     PackagesId = x.PackagesId,
                     PricePerSession = x.PricePerSession,
                     TotalNumberOfSessions = x.TotalNumberOfSessions,
                     TotalPrice = x.TotalPrice,
-                    CreatedDate = PackageId == 0 ? cart.CreatedDate : x.CreatedDate,
+                    CreatedDate = PackageId != 0 ? cart.CreatedDate : x.CreatedDate,
                     IsDeleted = x.IsDeleted,
                     OrderId = x.OrderId,
                     PackageName = x.PackageName,
@@ -122,18 +127,16 @@ namespace bodybykhoshalApi.Service
             try
             {
                 var adminUserGUID = _dbContext.Users.Where(x => x.RoleId == 1).FirstOrDefault();
-                String[] userGuids = new String[] { userGuid, adminUserGUID.UserGUID };
                 var chats = (from c in _dbContext.Chats
-                             join u in _dbContext.Users on c.UserId equals u.UserGUID
-                             where userGuids.Contains(c.UserId)
+                             where (c.SenderOne == userGuid && c.SenderTwo == adminUserGUID.UserGUID)
+                || (c.SenderOne == adminUserGUID.UserGUID && c.SenderTwo == userGuid)
                              orderby c.ChatId ascending
                              select new ChatsViewModel
                              {
                                  Content = c.Content,
                                  Timestamp = c.Timestamp,
-                                 FirstName = u.FirstName,
-                                 LastName = u.LastName,
-                                 RoleId = u.RoleId
+                                 SenderName = c.SenderName,
+                                 RoleId = c.RoleId
                              }).ToList();
 
                 return chats;
@@ -148,16 +151,27 @@ namespace bodybykhoshalApi.Service
         {
             try
             {
+                var sendUserObj = _dbContext.Users.Where(x => x.UserGUID == request.SenderOne).FirstOrDefault();
+                char firstChar = char.ToUpper(sendUserObj.FirstName[0]);
+                char secondChar = char.ToUpper(sendUserObj.LastName[0]);
+                string combinedLetters = $"{firstChar}{secondChar}";
+
+                var receiverUserObj = _dbContext.Users.Where(x => x.RoleId == 1).FirstOrDefault();
+
                 request.Timestamp = DateTime.Now;
+                request.SenderName = combinedLetters;
+                request.SenderTwo = receiverUserObj.UserGUID;
+                request.RoleId = sendUserObj.RoleId;
+
                 var chat = _mapper.Map<Chats>(request);
                 _dbContext.Chats.Add(chat);
                 _dbContext.SaveChanges();
 
                 return true;
             }
-            catch (Exception) 
-            { 
-                throw; 
+            catch (Exception)
+            {
+                throw;
             }
         }
     }
