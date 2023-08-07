@@ -32,7 +32,7 @@ namespace bodybykhoshalApi.Controllers
         public IActionResult RegisterUser(RegisterRequestHandler request)
         {
             var user = _authenticationService.CreateUser(request);
-            return Ok(user);
+            return Ok(new { Success = user });
         }
     }
 }

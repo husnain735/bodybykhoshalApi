@@ -26,7 +26,7 @@ namespace bodybykhoshalApi.Service
         {
             try
             {
-                var checkEmail = _dbContext.Users.Where(x => x.Email.Equals(requestHandler.Email)).FirstOrDefault();
+                var checkEmail = _dbContext.Users.Where(x => x.Email.Equals(requestHandler.Email) && !x.IsDeleted).FirstOrDefault();
                 if (checkEmail == null)
                 {
                     string hashedPassword = BCrypt.Net.BCrypt.HashPassword(requestHandler.Password);
@@ -40,6 +40,9 @@ namespace bodybykhoshalApi.Service
                         PasswordHash = hashedPassword,
                         PhoneNumber = requestHandler.PhoneNumber,
                         UserGUID = newGuid.ToString(),
+                        RoleId = requestHandler.RoleId,
+                        CreatedDate = DateTime.UtcNow,
+                        IsDeleted = false
                     };
 
                     _dbContext.Users.Add(user);
@@ -75,8 +78,9 @@ namespace bodybykhoshalApi.Service
                             new Claim(ClaimTypes.Name, checkEmailExists.FirstName + " " + checkEmailExists.LastName),
                             new Claim(ClaimTypes.NameIdentifier, checkEmailExists.UserGUID),
                             new Claim(ClaimTypes.Email, checkEmailExists.Email),
+                            new Claim(ClaimTypes.Role, checkEmailExists.RoleId.ToString()),
                             }),
-                            Expires = DateTime.UtcNow.AddHours(1),
+                            Expires = DateTime.UtcNow.AddDays(1),
                             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                         };
                         var token = tokenHandler.CreateToken(tokenDescriptor);

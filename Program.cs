@@ -30,20 +30,32 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowOrigin", builder =>
+//    {
+//        builder.AllowAnyOrigin()
+//        .AllowAnyHeader()
+//               .AllowAnyMethod();
+//    });
+//});
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowOrigin", builder =>
+    options.AddDefaultPolicy(builder =>
     {
-        builder.AllowAnyOrigin()
-        .AllowAnyHeader()
+        builder.WithOrigins("http://localhost:4200")
+               .AllowAnyHeader()
                .AllowAnyMethod();
     });
 });
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAuthenticationService,AuthenticationService>();
+builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
@@ -59,5 +71,19 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-app.UseCors("AllowOrigin");
+app.UseCors();
+app.Use((context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:4200");
+        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+        context.Response.StatusCode = 200;
+        return context.Response.WriteAsync("Preflight request handled successfully.");
+    }
+
+    return next();
+});
+
 app.Run();
