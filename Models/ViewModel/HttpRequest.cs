@@ -10,7 +10,11 @@
             public string? Content { get; set; }
             public int? RoleId { get; set; }
             public string? SenderName { get; set; }
-
+        }
+        public class GetAdminChatWithCustomerRequestHandler
+        {
+            public string? SenderOne { get; set; }
+            public string? SenderTwo { get; set; }
         }
     }
 }

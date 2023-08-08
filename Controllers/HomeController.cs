@@ -1,9 +1,7 @@
 ﻿using bodybykhoshalApi.IService;
 using bodybykhoshalApi.Models.Entities;
-using bodybykhoshalApi.Models.HttpRequestHandler;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using static bodybykhoshalApi.Models.ViewModel.HttpRequest;
 
@@ -21,20 +19,6 @@ namespace bodybykhoshalApi.Controllers
             _homeService = homeService;
         }
 
-        [HttpGet("GetPackages")]
-        public IActionResult GetPackages()
-        {
-            var packages = _homeService.GetPackages();
-            return Ok(packages);
-        }
-        [HttpGet("GetPackage/{PackageId}")]
-        public IActionResult GetPackage(int PackageId)
-        {
-            var userClaim = getClaims();
-            var UserGUID = userClaim.UserGUID;
-            var packages = _homeService.GetPackage(PackageId, UserGUID);
-            return Ok(packages);
-        }
         private Users getClaims()
         {
             Users usr = new Users();
@@ -51,6 +35,22 @@ namespace bodybykhoshalApi.Controllers
                 return usr;
             }
             return usr;
+        }
+
+        [HttpGet("GetPackages")]
+        public IActionResult GetPackages()
+        {
+            var packages = _homeService.GetPackages();
+            return Ok(packages);
+        }
+        [Authorize]
+        [HttpGet("GetPackage/{PackageId}")]
+        public IActionResult GetPackage(int PackageId)
+        {
+            var userClaim = getClaims();
+            var UserGUID = userClaim.UserGUID;
+            var packages = _homeService.GetPackage(PackageId, UserGUID);
+            return Ok(packages);
         }
 
         [Authorize]
