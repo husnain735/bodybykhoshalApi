@@ -12,5 +12,6 @@ namespace bodybykhoshalApi.Models.Entities
         public string? Content { get; set; }
         public int? RoleId { get; set; }
         public string? SenderName { get; set; }
+        public bool? IsRead { get; set; }
     }
 }

@@ -12,5 +12,7 @@
         public int RoleId { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime CreatedDate { get; set; }
+        public bool? IsNotify { get; set; }
+        public int TotalNotification { get; set; }
     }
 }

@@ -162,6 +162,7 @@ namespace bodybykhoshalApi.Service
                 request.SenderName = combinedLetters;
                 request.SenderTwo = receiverUserObj.UserGUID;
                 request.RoleId = sendUserObj.RoleId;
+                request.IsRead = false;
 
                 var chat = _mapper.Map<Chats>(request);
                 _dbContext.Chats.Add(chat);
