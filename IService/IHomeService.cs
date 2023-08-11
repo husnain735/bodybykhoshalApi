@@ -10,5 +10,8 @@ namespace bodybykhoshalApi.IService
         bool AddToCart(int PackageId,string userGuid);
         List<ChatsViewModel> GetChatWithAdmin(string userGuid);
         bool SaveChat(SaveChatRequestHandler request);
+        notificationViewModel getCustomerNotification(string userGuid);
+        bool readAllMessages(string userGuid);
+        List<BookinViewModel> getCustomerBookings(string UserGuid);
     }
 }

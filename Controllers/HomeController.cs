@@ -1,5 +1,6 @@
 ﻿using bodybykhoshalApi.IService;
 using bodybykhoshalApi.Models.Entities;
+using bodybykhoshalApi.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -79,6 +80,33 @@ namespace bodybykhoshalApi.Controllers
             request.SenderOne = userClaim.UserGUID;
             var user = _homeService.SaveChat(request);
             return Ok(new { Success = user });
+        }
+        [Authorize]
+        [HttpGet("getCustomerNotification")]
+        public IActionResult getCustomerNotification()
+        {
+            var userClaim = getClaims();
+            var UserGUID = userClaim.UserGUID;
+            var user = _homeService.getCustomerNotification(UserGUID);
+            return Ok(new { Success = user });
+        }
+        [Authorize]
+        [HttpGet("readAllMessages")]
+        public IActionResult readAllMessages()
+        {
+            var userClaim = getClaims();
+            var UserGUID = userClaim.UserGUID;
+            var user = _homeService.readAllMessages(UserGUID);
+            return Ok(new { Success = user });
+        }
+        [Authorize]
+        [HttpGet("getCustomerBookings")]
+        public IActionResult getCustomerBookings()
+        {
+            var userClaim = getClaims();
+            var UserGUID = userClaim.UserGUID;
+            var user = _homeService.getCustomerBookings(UserGUID);
+            return Ok(user);
         }
         
     }

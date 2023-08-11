@@ -18,6 +18,7 @@ namespace bodybykhoshalApi.Context
         public DbSet<Packages> Packages { get; set; }
         public DbSet<ShoppingCart> ShoppingCart { get; set; }
         public DbSet<Chats> Chats { get; set; }
+        public DbSet<Booking> Booking { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
@@ -26,6 +27,7 @@ namespace bodybykhoshalApi.Context
             modelBuilder.Entity<Packages>().ToTable("Packages", "dbo");
             modelBuilder.Entity<ShoppingCart>().ToTable("ShoppingCart", "dbo");
             modelBuilder.Entity<Chats>().ToTable("Chats", "dbo");
+            modelBuilder.Entity<Booking>().ToTable("Booking", "dbo");
 
             base.OnModelCreating(modelBuilder);
         }

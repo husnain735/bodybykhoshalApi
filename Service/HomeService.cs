@@ -74,7 +74,6 @@ namespace bodybykhoshalApi.Service
                 }).FirstOrDefault();
 
                 return packages;
-
             }
             catch (Exception)
             {
@@ -172,6 +171,79 @@ namespace bodybykhoshalApi.Service
             }
             catch (Exception)
             {
+                throw;
+            }
+        }
+        public notificationViewModel getCustomerNotification(string userGuid)
+        {
+            try
+            {
+                var notification = new notificationViewModel();
+
+                var IsNotify = _dbContext.Chats.Where(x => x.SenderTwo == userGuid && x.IsRead == false).ToList();
+                if (IsNotify.Count() > 0)
+                {
+                    notification.TotalNotification = IsNotify.Count();
+                    notification.IsNotify = true;
+                }
+                else
+                {
+                    notification.TotalNotification = IsNotify.Count();
+                    notification.IsNotify = false;
+                }
+                return notification;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public bool readAllMessages(string userGuid)
+        {
+            try
+            {
+                var chats = _dbContext.Chats.Where(x => x.SenderTwo == userGuid && x.IsRead == false).ToList();
+                if (chats.Count > 0)
+                {
+                    foreach (var item in chats)
+                    {
+                        item.IsRead = true;
+                    }
+                    _dbContext.UpdateRange(chats);
+                    _dbContext.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public List<BookinViewModel> getCustomerBookings(string UserGuid)
+        {
+            try
+            {
+                var bookings = _dbContext.Booking.Where(x => x.UserId == UserGuid).Select(x => new BookinViewModel
+                {
+                    Id = x.BookingId,
+                    Title = x.Title,
+                    Start = x.StartDate,
+                    End = x.EndDate,
+                    Details = x.Details,
+                    StatusId = x.StatusId,
+                    CreatedDate = x.CreatedDate,
+                    IsDeleted = x.IsDeleted,
+                    UserId = x.UserId,
+                }).ToList();
+
+                return bookings;
+            }
+            catch (Exception)
+            {
+
                 throw;
             }
         }
