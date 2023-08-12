@@ -32,7 +32,23 @@ namespace bodybykhoshalApi.Service
                     UserGUID = x.UserGUID,
                 }).ToList();
 
-				return users;
+                foreach (var item in users)
+                {
+                    var IsNotify = _dbContext.Chats.Where(x => x.SenderOne == item.UserGUID && x.IsRead == false).ToList();
+                    if (IsNotify.Count() > 0)
+                    {
+                        item.TotalNotification = IsNotify.Count();
+                        item.IsNotify = true;
+                    }
+                    else
+                    {
+                        item.TotalNotification = IsNotify.Count();
+                        item.IsNotify = false;
+                    }
+                }
+
+
+                return users;
 			}
 			catch (Exception)
 			{
@@ -77,11 +93,35 @@ namespace bodybykhoshalApi.Service
                 request.SenderName = combinedLetters;
                 request.SenderTwo = request.SenderTwo;
                 request.RoleId = sendUserObj.RoleId;
+                request.IsRead = false;
 
                 var chat = _mapper.Map<Chats>(request);
                 _dbContext.Chats.Add(chat);
                 _dbContext.SaveChanges();
                 return true;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public bool readAllMessages(GetAdminChatWithCustomerRequestHandler request)
+        {
+            try
+            {
+                var chats = _dbContext.Chats.Where(x => x.SenderOne == request.SenderOne && x.IsRead == false).ToList();
+                if (chats.Count > 0)
+                {
+                    foreach (var item in chats)
+                    {
+                        item.IsRead = true;
+                    }
+                    _dbContext.UpdateRange(chats);
+                    _dbContext.SaveChanges();
+                    return true;
+                }
+                return false;
             }
             catch (Exception)
             {

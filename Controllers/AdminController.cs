@@ -57,5 +57,12 @@ namespace bodybykhoshalApi.Controllers
             var user = _adminService.saveChatForAdmin(request);
             return Ok(new { Success = user });
         }
+        [Authorize]
+        [HttpPost("readAllMessages")]
+        public IActionResult readAllMessages(GetAdminChatWithCustomerRequestHandler request)
+        {
+            var user = _adminService.readAllMessages(request);
+            return Ok(new { Success = user });
+        }
     }
 }

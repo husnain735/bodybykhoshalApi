@@ -8,5 +8,6 @@ namespace bodybykhoshalApi.IService
         List<UserViewModel> GetAllCustomers();
         List<ChatsViewModel> GetAdminChatWithCustomer(GetAdminChatWithCustomerRequestHandler request);
         bool saveChatForAdmin(SaveChatRequestHandler request);
+        bool readAllMessages(GetAdminChatWithCustomerRequestHandler request);
     }
 }
