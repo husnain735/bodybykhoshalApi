@@ -1,15 +1,17 @@
-﻿namespace bodybykhoshalApi.Models.ViewModel
+namespace bodybykhoshalApi.Models.ViewModel
 {
-    public class BookinViewModel
-    {
-        public int Id { get; set; }
-        public string? Title { get; set; }
-        public DateTime? Start { get; set; }
-        public DateTime? End { get; set; }
-        public string? Details { get; set; }
-        public int? StatusId { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public bool? IsDeleted { get; set; }
-        public string? UserId { get; set; }
-    }
+  public class BookinViewModel
+  {
+    public int Id { get; set; }
+    public string? Title { get; set; }
+    public DateTime? Start { get; set; }
+    public DateTime? End { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public string? Details { get; set; }
+    public int? StatusId { get; set; }
+    public DateTime? CreatedDate { get; set; }
+    public bool? IsDeleted { get; set; }
+    public string? UserId { get; set; }
+  }
 }

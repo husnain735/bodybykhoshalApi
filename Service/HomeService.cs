@@ -247,12 +247,55 @@ namespace bodybykhoshalApi.Service
         throw;
       }
     }
-    public int saveCustomerBooking(BookinViewModel request)
+    public BookinViewModel saveCustomerBooking(BookinViewModel request)
     {
       try
       {
-        
-        return 0;
+        var response = new BookinViewModel();
+        if (request.Id != 0)
+        {
+          var booking = _dbContext.Booking.Where(x => x.UserId == request.UserId && x.BookingId == request.Id).FirstOrDefault();
+          if (booking != null)
+          {
+            booking.StartDate = request.Start;
+            booking.EndDate = request.End;
+            booking.Details= request.Details;
+
+            _dbContext.Update(booking);
+            _dbContext.SaveChanges();
+
+            response.Title = booking.Title;
+            response.Id = request.Id;
+            return response;
+          }
+          return response;
+
+        } else
+        {
+          var checkBooking = _dbContext.Booking.Where(x => x.StartDate == request.Start && x.EndDate == request.End && x.UserId == request.UserId).FirstOrDefault();
+          if (checkBooking != null)
+          {
+            response.Title = request.Title;
+            response.Id = 0;
+            return response;
+          }
+
+          request.StartDate = request.Start;
+          request.EndDate = request.End;
+          request.CreatedDate = DateTime.Now;
+          request.StatusId = 1;
+          request.IsDeleted = false;
+
+          var booking = _mapper.Map<Booking>(request);
+          _dbContext.Booking.Add(booking);
+          _dbContext.SaveChanges();
+          response = new BookinViewModel
+          {
+            Id = booking.BookingId,
+            Title = booking.Title,
+          };
+          return response;
+        }
       }
       catch (Exception)
       {
