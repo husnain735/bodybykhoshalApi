@@ -4,8 +4,8 @@ namespace bodybykhoshalApi.Models.ViewModel
   {
     public int Id { get; set; }
     public string? Title { get; set; }
-    public DateTime? Start { get; set; }
-    public DateTime? End { get; set; }
+    public string? Start { get; set; }
+    public string? End { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string? Details { get; set; }
