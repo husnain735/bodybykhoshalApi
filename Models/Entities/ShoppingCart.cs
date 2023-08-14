@@ -10,5 +10,6 @@ namespace bodybykhoshalApi.Models.Entities
         public int? PackageId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public bool? IsDeleted { get; set; }
+        public int? StatusId { get; set; }
     }
 }

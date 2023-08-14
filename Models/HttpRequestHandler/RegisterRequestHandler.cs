@@ -9,4 +9,10 @@
         public string Password { get; set; }
         public int RoleId { get; set; }
     }
+    public class ApproveAndRejectBookingRequestHandler
+    {
+        public int? BookinId { get; set; }
+        public string? UserGuid { get; set; }
+        public int? StatusId { get; set; }
+    }
 }

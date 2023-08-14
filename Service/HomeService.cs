@@ -108,7 +108,8 @@ namespace bodybykhoshalApi.Service
                         UserId = userGuid,
                         CreatedDate = DateTime.UtcNow,
                         IsDeleted = false,
-                        PackageId = PackageId
+                        PackageId = PackageId,
+                        StatusId = 1
                     };
 
                     _dbContext.Add(cart);

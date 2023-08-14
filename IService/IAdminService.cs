@@ -1,3 +1,4 @@
+using bodybykhoshalApi.Models.HttpRequestHandler;
 using bodybykhoshalApi.Models.ViewModel;
 using static bodybykhoshalApi.Models.ViewModel.HttpRequest;
 
@@ -9,6 +10,8 @@ namespace bodybykhoshalApi.IService
         List<ChatsViewModel> GetAdminChatWithCustomer(GetAdminChatWithCustomerRequestHandler request);
         bool saveChatForAdmin(SaveChatRequestHandler request);
         bool readAllMessages(GetAdminChatWithCustomerRequestHandler request);
-    List<BookinViewModel> getCustomersBookings(string UserGuid);
+        List<BookinViewModel> getCustomersBookings(string UserGuid);
+        int approveAndRejectBooking(ApproveAndRejectBookingRequestHandler request);
+        List<ShoppingCartViewModel> getAllCustomerPackages();
     }
 }
