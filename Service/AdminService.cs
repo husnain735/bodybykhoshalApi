@@ -200,6 +200,7 @@ namespace bodybykhoshalApi.Service
                    join u in _dbContext.Users on sc.UserId equals u.UserGUID
                    select new ShoppingCartViewModel
                    {
+                     ShoppingCartId = sc.ShoppingCartId,
                      FirstName = u.FirstName,
                      LastName = u.LastName,
                      PackageName = p.PackageName,
@@ -212,6 +213,26 @@ namespace bodybykhoshalApi.Service
 
 
         return res;
+      }
+      catch (Exception)
+      {
+
+        throw;
+      }
+    }
+    public bool paymentApproved(paymentApprovedRequestHandler request)
+    {
+      try
+      {
+        var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == request.ShoppingCartId).FirstOrDefault();
+        if (cart != null)
+        {
+          cart.StatusId = request.StatusId;
+          _dbContext.Update(cart);
+          _dbContext.SaveChanges();
+          return true;
+        }
+        return false;
       }
       catch (Exception)
       {

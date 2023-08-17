@@ -2,6 +2,7 @@ namespace bodybykhoshalApi.Models.ViewModel
 {
   public class ShoppingCartViewModel
   {
+    public int? ShoppingCartId { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? PackageName { get; set; }

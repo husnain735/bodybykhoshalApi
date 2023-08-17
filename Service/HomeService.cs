@@ -274,8 +274,16 @@ namespace bodybykhoshalApi.Service
     {
       try
       {
+
         string format = "yyyy-MM-dd HH:mm:ss";
         var response = new BookinViewModel();
+        DateTime currentDate = DateTime.Now.Date;
+
+        var checkBookings = _dbContext.Booking.Where(x => x.CreatedDate.HasValue && x.CreatedDate.Value.Date == currentDate.Date).Count();
+        if (checkBookings >= 2 && request.Id == 0)
+        {
+          return response;
+        }
         if (request.Id != 0)
         {
           var booking = _dbContext.Booking.Where(x => x.UserId == request.UserId && x.BookingId == request.Id).FirstOrDefault();
