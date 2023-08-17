@@ -279,7 +279,7 @@ namespace bodybykhoshalApi.Service
         var response = new BookinViewModel();
         DateTime currentDate = DateTime.Now.Date;
 
-        var checkBookings = _dbContext.Booking.Where(x => x.CreatedDate.HasValue && x.CreatedDate.Value.Date == currentDate.Date).Count();
+        var checkBookings = _dbContext.Booking.Where(x => x.StartDate.HasValue && x.StartDate.Value.Date == currentDate.Date && x.UserId == request.UserId).Count();
         if (checkBookings >= 2 && request.Id == 0)
         {
           return response;
