@@ -204,7 +204,7 @@ namespace bodybykhoshalApi.Service
                      FirstName = u.FirstName,
                      LastName = u.LastName,
                      PackageName = p.PackageName,
-                     TotalNumberOfSessions = p.TotalNumberOfSessions,
+                     TotalNumberOfSessions = sc.TotalSessions,
                      StatusId = sc.StatusId,
                      TotalPrice = p.TotalPrice,
                      PhoneNumber = u.PhoneNumber,
@@ -218,27 +218,47 @@ namespace bodybykhoshalApi.Service
       {
 
         throw;
-      }
-    }
-    public bool paymentApproved(paymentApprovedRequestHandler request)
-    {
-      try
-      {
-        var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == request.ShoppingCartId).FirstOrDefault();
-        if (cart != null)
-        {
-          cart.StatusId = request.StatusId;
-          _dbContext.Update(cart);
-          _dbContext.SaveChanges();
-          return true;
+            }
         }
-        return false;
-      }
-      catch (Exception)
-      {
+        public bool paymentApproved(paymentApprovedRequestHandler request)
+        {
+            try
+            {
+                var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == request.ShoppingCartId).FirstOrDefault();
+                if (cart != null)
+                {
+                    cart.StatusId = request.StatusId;
+                    _dbContext.Update(cart);
+                    _dbContext.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
 
-        throw;
-      }
+                throw;
+            }
+        }
+        public bool addSession(addSessionRequestHandler request)
+        {
+            try
+            {
+                var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == request.ShoppingCartId).FirstOrDefault();
+                if (cart != null)
+                {
+                    cart.TotalSessions += request.SessionCount;
+                    _dbContext.Update(cart);
+                    _dbContext.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
-  }
 }

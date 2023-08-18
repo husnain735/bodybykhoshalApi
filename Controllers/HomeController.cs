@@ -122,5 +122,14 @@ namespace bodybykhoshalApi.Controllers
       var user = _homeService.saveCustomerBooking(request);
       return Ok(user);
     }
-  }
+        [Authorize]
+        [HttpGet("GetCustomerPackage")]
+        public IActionResult GetCustomerPackage()
+        {
+            var userClaim = getClaims();
+            var UserGUID = userClaim.UserGUID;
+            var packages = _homeService.GetCustomerPackage(UserGUID);
+            return Ok(packages);
+        }
+    }
 }

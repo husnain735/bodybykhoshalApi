@@ -12,5 +12,7 @@
         public DateTime? CreatedDate { get; set;}
         public bool? IsDeleted { get; set; }
         public int? OrderId { get; set; }
+        public int? StatusId { get; set; }
+        public int? TotalSessions { get; set; }
     }
 }

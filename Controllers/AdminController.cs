@@ -99,5 +99,14 @@ namespace bodybykhoshalApi.Controllers
       var user = _adminService.paymentApproved(request);
       return Ok(user);
     }
-  }
+        [Authorize]
+        [HttpPost("addSession")]
+        public IActionResult addSession(addSessionRequestHandler request)
+        {
+            var userClaim = getClaims();
+            request.UserId = userClaim.UserGUID;
+            var user = _adminService.addSession(request);
+            return Ok(user);
+        }
+    }
 }

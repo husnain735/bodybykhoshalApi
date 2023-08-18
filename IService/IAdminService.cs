@@ -13,6 +13,7 @@ namespace bodybykhoshalApi.IService
     List<BookinViewModel> getCustomersBookings(string UserGuid);
     int approveAndRejectBooking(ApproveAndRejectBookingRequestHandler request);
     List<ShoppingCartViewModel> getAllCustomerPackages();
-    bool paymentApproved(paymentApprovedRequestHandler request); 
+    bool paymentApproved(paymentApprovedRequestHandler request);
+        bool addSession(addSessionRequestHandler request);
   }
 }

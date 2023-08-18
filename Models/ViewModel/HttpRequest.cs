@@ -17,5 +17,11 @@
             public string? SenderOne { get; set; }
             public string? SenderTwo { get; set; }
         }
+        public class addSessionRequestHandler
+        {
+            public int? ShoppingCartId { get; set; }
+            public int SessionCount { get; set; }
+            public string? UserId { get; set; }
+        }
     }
 }

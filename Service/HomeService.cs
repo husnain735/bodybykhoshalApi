@@ -114,7 +114,8 @@ namespace bodybykhoshalApi.Service
             CreatedDate = DateTime.UtcNow,
             IsDeleted = false,
             PackageId = PackageId,
-            StatusId = 1
+            StatusId = 1,
+            TotalSessions = package.TotalNumberOfSessions
           };
 
           _dbContext.Add(cart);
@@ -277,9 +278,9 @@ namespace bodybykhoshalApi.Service
 
         string format = "yyyy-MM-dd HH:mm:ss";
         var response = new BookinViewModel();
-        DateTime currentDate = DateTime.Now.Date;
+        var date = DateTime.ParseExact(request.Start, format, null);
 
-        var checkBookings = _dbContext.Booking.Where(x => x.StartDate.HasValue && x.StartDate.Value.Date == currentDate.Date && x.UserId == request.UserId).Count();
+                var checkBookings = _dbContext.Booking.Where(x => x.StartDate.HasValue && x.StartDate.Value.Date == date.Date && x.UserId == request.UserId).Count();
         if (checkBookings >= 2 && request.Id == 0)
         {
           return response;
@@ -339,5 +340,44 @@ namespace bodybykhoshalApi.Service
       }
 
     }
+        public PackagesViewModel GetCustomerPackage(string userGuid)
+        {
+            try
+            {
+                var package = new PackagesViewModel();
+                var cart = _dbContext.ShoppingCart.Where(x => x.UserId == userGuid && x.StatusId == 2).FirstOrDefault();
+                if (cart != null)
+                {
+                    package = (from sc in _dbContext.ShoppingCart
+                                   join p in _dbContext.Packages on sc.PackageId equals p.PackagesId
+                                   where cart.ShoppingCartId == sc.ShoppingCartId
+                                   select new PackagesViewModel
+                                   {
+                                       Description = p.Description,
+                                       PackagesId = p.PackagesId,
+                                       PricePerSession = p.PricePerSession,
+                                       TotalNumberOfSessions = p.TotalNumberOfSessions,
+                                       TotalPrice = p.TotalPrice,
+                                       CreatedDate = p.CreatedDate,
+                                       IsDeleted = p.IsDeleted,
+                                       OrderId = p.OrderId,
+                                       PackageName = p.PackageName,
+                                       UserId = p.UserId,
+                                       StatusId = sc.StatusId,
+                                       TotalSessions = sc.TotalSessions,
+                                   }).FirstOrDefault();
+                } else
+                {
+                    package.StatusId = 1;
+                }
+                
+                return package;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
   }
 }

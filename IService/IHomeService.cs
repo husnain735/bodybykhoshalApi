@@ -14,5 +14,6 @@ namespace bodybykhoshalApi.IService
     bool readAllMessages(string userGuid);
     List<BookinViewModel> getCustomerBookings(string UserGuid);
     BookinViewModel saveCustomerBooking(BookinViewModel request);
+        PackagesViewModel GetCustomerPackage(string userGuid);
   }
 }
