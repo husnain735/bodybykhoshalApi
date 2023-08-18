@@ -237,7 +237,7 @@ namespace bodybykhoshalApi.Service
       {
         string format = "yyyy-MM-dd HH:mm:ss";
 
-        var bookings = _dbContext.Booking.Where(x => x.UserId == UserGuid).Select(x => new BookinViewModel
+        var bookings = _dbContext.Booking.Where(x => x.UserId == UserGuid && x.IsDeleted == false).Select(x => new BookinViewModel
         {
           Id = x.BookingId,
           Title = x.Title,
@@ -316,20 +316,28 @@ namespace bodybykhoshalApi.Service
             return response;
           }
 
-          request.StartDate = DateTime.ParseExact(request.Start, format, null);
-          request.EndDate = DateTime.ParseExact(request.End, format, null);
-          request.CreatedDate = DateTime.Now;
-          request.StatusId = 1;
-          request.IsDeleted = false;
-
-          var booking = _mapper.Map<Booking>(request);
-          _dbContext.Booking.Add(booking);
-          _dbContext.SaveChanges();
-          response = new BookinViewModel
+          var cart = _dbContext.ShoppingCart.Where(x => x.UserId == request.UserId && x.StatusId == 2 && x.IsDeleted == false).FirstOrDefault();
+          if (cart != null && cart.TotalSessions > 0)
           {
-            Id = booking.BookingId,
-            Title = booking.Title,
-          };
+            request.ShoppingCartId = cart.ShoppingCartId;
+            request.StartDate = DateTime.ParseExact(request.Start, format, null);
+            request.EndDate = DateTime.ParseExact(request.End, format, null);
+            request.CreatedDate = DateTime.Now;
+            request.StatusId = 1;
+            request.IsDeleted = false;
+
+            var booking = _mapper.Map<Booking>(request);
+            _dbContext.Booking.Add(booking);
+            _dbContext.SaveChanges();
+            response = new BookinViewModel
+            {
+              Id = booking.BookingId,
+              Title = booking.Title,
+            };
+            return response;
+          }
+          response.Title = request.Title;
+          response.Id = 0;
           return response;
         }
       }
@@ -350,7 +358,7 @@ namespace bodybykhoshalApi.Service
                 {
                     package = (from sc in _dbContext.ShoppingCart
                                    join p in _dbContext.Packages on sc.PackageId equals p.PackagesId
-                                   where cart.ShoppingCartId == sc.ShoppingCartId
+                                   where cart.ShoppingCartId == sc.ShoppingCartId && sc.IsDeleted == false
                                    select new PackagesViewModel
                                    {
                                        Description = p.Description,

@@ -13,5 +13,6 @@ namespace bodybykhoshalApi.Models.ViewModel
     public DateTime? CreatedDate { get; set; }
     public bool? IsDeleted { get; set; }
     public string? UserId { get; set; }
+    public int? ShoppingCartId { get; set; }
   }
 }

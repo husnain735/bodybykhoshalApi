@@ -1,5 +1,6 @@
 using bodybykhoshalApi.Models.HttpRequestHandler;
 using bodybykhoshalApi.Models.ViewModel;
+using static bodybykhoshalApi.Models.HttpResponseHandler.HttpResponseHandler;
 using static bodybykhoshalApi.Models.ViewModel.HttpRequest;
 
 namespace bodybykhoshalApi.IService
@@ -11,9 +12,10 @@ namespace bodybykhoshalApi.IService
     bool saveChatForAdmin(SaveChatRequestHandler request);
     bool readAllMessages(GetAdminChatWithCustomerRequestHandler request);
     List<BookinViewModel> getCustomersBookings(string UserGuid);
-    int approveAndRejectBooking(ApproveAndRejectBookingRequestHandler request);
+    approveAndRejectBookingResponseHandler approveAndRejectBooking(ApproveAndRejectBookingRequestHandler request);
     List<ShoppingCartViewModel> getAllCustomerPackages();
     bool paymentApproved(paymentApprovedRequestHandler request);
-        bool addSession(addSessionRequestHandler request);
+    bool addSession(addSessionRequestHandler request);
+    bool completeSession(int BookingId);
   }
 }

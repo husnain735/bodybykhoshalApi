@@ -5,6 +5,7 @@ using bodybykhoshalApi.Models.Entities;
 using bodybykhoshalApi.Models.HttpRequestHandler;
 using bodybykhoshalApi.Models.ViewModel;
 using Microsoft.EntityFrameworkCore;
+using static bodybykhoshalApi.Models.HttpResponseHandler.HttpResponseHandler;
 using static bodybykhoshalApi.Models.ViewModel.HttpRequest;
 
 namespace bodybykhoshalApi.Service
@@ -137,7 +138,7 @@ namespace bodybykhoshalApi.Service
       {
         string format = "yyyy-MM-dd HH:mm:ss";
 
-        var bookings = _dbContext.Booking.Where(x => x.UserId != UserGuid).Select(x => new BookinViewModel
+        var bookings = _dbContext.Booking.Where(x => x.UserId != UserGuid && x.IsDeleted == false).Select(x => new BookinViewModel
         {
           Id = x.BookingId,
           Title = x.Title,
@@ -171,19 +172,30 @@ namespace bodybykhoshalApi.Service
         throw;
       }
     }
-    public int approveAndRejectBooking(ApproveAndRejectBookingRequestHandler request)
+    public approveAndRejectBookingResponseHandler approveAndRejectBooking(ApproveAndRejectBookingRequestHandler request)
     {
       try
       {
+        var response = new approveAndRejectBookingResponseHandler();
+
         var booking = _dbContext.Booking.Where(x => x.BookingId == request.BookinId).FirstOrDefault();
         if (booking != null)
         {
-          booking.StatusId = request.StatusId;
-          _dbContext.Update(booking);
-          _dbContext.SaveChanges();
-          return booking.BookingId;
+          var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId== booking.ShoppingCartId).FirstOrDefault();
+          if (cart != null && cart.TotalSessions > 0)
+          {
+            booking.StatusId = request.StatusId;
+            _dbContext.Update(booking);
+            _dbContext.SaveChanges();
+            response.Id = booking.BookingId;
+            response.Success = true;
+            return response;
+          }
+          response.Success = false;
+          return response;
         }
-        return Convert.ToInt32(request.BookinId);
+        response.Success = false;
+        return response;
       }
       catch (Exception)
       {
@@ -218,47 +230,77 @@ namespace bodybykhoshalApi.Service
       {
 
         throw;
-            }
-        }
-        public bool paymentApproved(paymentApprovedRequestHandler request)
-        {
-            try
-            {
-                var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == request.ShoppingCartId).FirstOrDefault();
-                if (cart != null)
-                {
-                    cart.StatusId = request.StatusId;
-                    _dbContext.Update(cart);
-                    _dbContext.SaveChanges();
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-        public bool addSession(addSessionRequestHandler request)
-        {
-            try
-            {
-                var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == request.ShoppingCartId).FirstOrDefault();
-                if (cart != null)
-                {
-                    cart.TotalSessions += request.SessionCount;
-                    _dbContext.Update(cart);
-                    _dbContext.SaveChanges();
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
+      }
     }
+    public bool paymentApproved(paymentApprovedRequestHandler request)
+    {
+      try
+      {
+        var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == request.ShoppingCartId).FirstOrDefault();
+        if (cart != null)
+        {
+          cart.StatusId = request.StatusId;
+          _dbContext.Update(cart);
+          _dbContext.SaveChanges();
+          return true;
+        }
+        return false;
+      }
+      catch (Exception)
+      {
+
+        throw;
+      }
+    }
+    public bool addSession(addSessionRequestHandler request)
+    {
+      try
+      {
+        var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == request.ShoppingCartId).FirstOrDefault();
+        if (cart != null)
+        {
+          cart.TotalSessions += request.SessionCount;
+          _dbContext.Update(cart);
+          _dbContext.SaveChanges();
+          return true;
+        }
+        return false;
+      }
+      catch (Exception)
+      {
+
+        throw;
+      }
+    }
+    public bool completeSession(int BookingId)
+    {
+      try
+      {
+        var booking = _dbContext.Booking.Where(x => x.BookingId== BookingId).FirstOrDefault();
+        if (booking != null)
+        {
+          booking.StatusId = 4;
+          var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == booking.ShoppingCartId).FirstOrDefault();
+          if (cart != null)
+          {
+            if (cart.TotalSessions > 0)
+            {
+              cart.TotalSessions -= 1;
+            }
+            _dbContext.Update(booking);
+            _dbContext.Update(cart);
+            _dbContext.SaveChanges();
+            return true;
+          }
+          return false;
+        }
+        return false;
+      }
+      catch (Exception)
+      {
+
+        throw;
+      }
+    }
+  }
 }
