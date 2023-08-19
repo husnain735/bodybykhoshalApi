@@ -317,7 +317,9 @@ namespace bodybykhoshalApi.Service
           }
 
           var cart = _dbContext.ShoppingCart.Where(x => x.UserId == request.UserId && x.StatusId == 2 && x.IsDeleted == false).FirstOrDefault();
-          if (cart != null && cart.TotalSessions > 0)
+          var bookingCount = _dbContext.Booking.Where(x => x.UserId == request.UserId && x.ShoppingCartId == cart.ShoppingCartId).Count();
+          
+          if (cart != null && cart.TotalSessions > 0 && bookingCount < cart.TotalSessions)
           {
             request.ShoppingCartId = cart.ShoppingCartId;
             request.StartDate = DateTime.ParseExact(request.Start, format, null);
@@ -353,7 +355,7 @@ namespace bodybykhoshalApi.Service
             try
             {
                 var package = new PackagesViewModel();
-                var cart = _dbContext.ShoppingCart.Where(x => x.UserId == userGuid && x.StatusId == 2).FirstOrDefault();
+                var cart = _dbContext.ShoppingCart.Where(x => x.UserId == userGuid && (x.StatusId == 2 || x.StatusId == 1)).FirstOrDefault();
                 if (cart != null)
                 {
                     package = (from sc in _dbContext.ShoppingCart
@@ -376,7 +378,7 @@ namespace bodybykhoshalApi.Service
                                    }).FirstOrDefault();
                 } else
                 {
-                    package.StatusId = 1;
+                    package.StatusId = 0;
                 }
                 
                 return package;

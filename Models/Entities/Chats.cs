@@ -13,5 +13,6 @@ namespace bodybykhoshalApi.Models.Entities
         public int? RoleId { get; set; }
         public string? SenderName { get; set; }
         public bool? IsRead { get; set; }
+        public int? ChatType { get; set; }
     }
 }
