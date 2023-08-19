@@ -7,6 +7,8 @@ using bodybykhoshalApi.Models.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using static bodybykhoshalApi.Models.HttpResponseHandler.HttpResponseHandler;
 using static bodybykhoshalApi.Models.ViewModel.HttpRequest;
+using System.Net.Http.Headers;
+using Azure.Core;
 
 namespace bodybykhoshalApi.Service
 {
@@ -72,7 +74,8 @@ namespace bodybykhoshalApi.Service
                        Content = c.Content,
                        Timestamp = c.Timestamp,
                        SenderName = c.SenderName,
-                       RoleId = c.RoleId
+                       RoleId = c.RoleId,
+                       ChatType = c.ChatType,
                      }).ToList();
         return chats;
       }
@@ -181,7 +184,7 @@ namespace bodybykhoshalApi.Service
         var booking = _dbContext.Booking.Where(x => x.BookingId == request.BookinId).FirstOrDefault();
         if (booking != null)
         {
-          var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId== booking.ShoppingCartId).FirstOrDefault();
+          var cart = _dbContext.ShoppingCart.Where(x => x.ShoppingCartId == booking.ShoppingCartId).FirstOrDefault();
           if (cart != null && cart.TotalSessions > 0)
           {
             booking.StatusId = request.StatusId;
@@ -276,7 +279,7 @@ namespace bodybykhoshalApi.Service
     {
       try
       {
-        var booking = _dbContext.Booking.Where(x => x.BookingId== BookingId).FirstOrDefault();
+        var booking = _dbContext.Booking.Where(x => x.BookingId == BookingId).FirstOrDefault();
         if (booking != null)
         {
           booking.StatusId = 4;
@@ -295,6 +298,86 @@ namespace bodybykhoshalApi.Service
           return false;
         }
         return false;
+      }
+      catch (Exception)
+      {
+
+        throw;
+      }
+    }
+    public List<PackagesViewModel> GetPackages()
+    {
+      try
+      {
+        var packages = _dbContext.Packages.Where(x => x.IsDeleted == false).Select(x => new PackagesViewModel
+        {
+          Description = x.Description,
+          PackagesId = x.PackagesId,
+          PricePerSession = x.PricePerSession,
+          TotalNumberOfSessions = x.TotalNumberOfSessions,
+          TotalPrice = x.TotalPrice,
+          CreatedDate = x.CreatedDate,
+          IsDeleted = x.IsDeleted,
+          OrderId = x.OrderId,
+          PackageName = x.PackageName,
+          UserId = x.UserId
+        }).ToList();
+
+        return packages;
+      }
+      catch (Exception)
+      {
+
+        throw;
+      }
+    }
+    public bool SavePackage(PackagesViewModel request)
+    {
+      try
+      {
+        if (request.PackagesId == 0 || request.PackagesId == null)
+        {
+          request.IsDeleted = false;
+          request.CreatedDate = DateTime.Now;
+          var package = _mapper.Map<Packages>(request);
+          _dbContext.Add(package);
+          _dbContext.SaveChanges();
+        } else
+        {
+          var package = _dbContext.Packages.Where(x => x.PackagesId == request.PackagesId).FirstOrDefault();
+          if (package != null)
+          {
+            package.PackageName = request.PackageName;
+            package.TotalNumberOfSessions = request.TotalNumberOfSessions;
+            package.TotalPrice = request.TotalPrice;
+            package.PricePerSession = request.PricePerSession;
+            package.Description = request.Description;
+            package.OrderId = request.OrderId;
+            _dbContext.Update(package);
+            _dbContext.SaveChanges();
+          }
+        }
+        
+        return true;
+      }
+      catch (Exception)
+      {
+
+        throw;
+      }
+    }
+    public bool DeletePackage(int PackageId)
+    {
+      try
+      {
+        var package = _dbContext.Packages.Where(x => x.PackagesId == PackageId).FirstOrDefault();
+        if (package != null)
+        {
+          package.IsDeleted = true;
+          _dbContext.Update(package);
+          _dbContext.SaveChanges();
+        }
+        return true;
       }
       catch (Exception)
       {

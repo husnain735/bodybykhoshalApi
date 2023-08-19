@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static bodybykhoshalApi.Models.ViewModel.HttpRequest;
+using System.Net.Http.Headers;
+using Microsoft.Extensions.Configuration;
+using bodybykhoshalApi.Models.ViewModel;
 
 namespace bodybykhoshalApi.Controllers
 {
@@ -113,6 +116,50 @@ namespace bodybykhoshalApi.Controllers
     public IActionResult completeSession(int BookingId)
     {
       var user = _adminService.completeSession(BookingId);
+      return Ok(user);
+    }
+    [Authorize]
+    [Route("UploadChat")]
+    [HttpPost, DisableRequestSizeLimit]
+    public IActionResult UploadChat()
+    {
+      var file = Request.Form.Files[0];
+      var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+      var path = Path.Combine(Directory.GetCurrentDirectory(), "chatImages");
+      var url = path;
+      bool exists = Directory.Exists(url);
+      if (!exists)
+      {
+        Directory.CreateDirectory(url);
+      }
+      var fullPath = Path.Combine(url, fileName);
+      using (var stream = new FileStream(fullPath, FileMode.Create))
+      {
+        file.CopyTo(stream);
+      }
+      return Ok("chatImages/" + fileName);
+    }
+    [Authorize]
+    [HttpGet("GetPackages")]
+    public IActionResult GetPackages()
+    {
+      var packages = _adminService.GetPackages();
+      return Ok(packages);
+    }
+    [Authorize]
+    [HttpPost("SavePackage")]
+    public IActionResult SavePackage(PackagesViewModel request)
+    {
+      var userClaim = getClaims();
+      request.UserId = userClaim.UserGUID;
+      var packages = _adminService.SavePackage(request);
+      return Ok(packages);
+    }
+    [Authorize]
+    [HttpGet("DeletePackage/{PackageId}")]
+    public IActionResult DeletePackage(int PackageId)
+    {
+      var user = _adminService.DeletePackage(PackageId);
       return Ok(user);
     }
   }

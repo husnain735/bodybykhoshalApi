@@ -17,5 +17,8 @@ namespace bodybykhoshalApi.IService
     bool paymentApproved(paymentApprovedRequestHandler request);
     bool addSession(addSessionRequestHandler request);
     bool completeSession(int BookingId);
+    List<PackagesViewModel> GetPackages();
+    bool SavePackage(PackagesViewModel request);
+    bool DeletePackage(int PackageId);
   }
 }

@@ -10,5 +10,6 @@ public class MappingProfile : Profile
     CreateMap<Users, UserViewModel>();
     CreateMap<SaveChatRequestHandler, Chats>();
     CreateMap<BookinViewModel, Booking>();
+    CreateMap<PackagesViewModel, Packages>();
   }
 }

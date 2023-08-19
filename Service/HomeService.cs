@@ -1,9 +1,12 @@
 using AutoMapper;
+using Azure.Core;
 using bodybykhoshalApi.Context;
 using bodybykhoshalApi.IService;
 using bodybykhoshalApi.Models.Entities;
 using bodybykhoshalApi.Models.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using static bodybykhoshalApi.Models.ViewModel.HttpRequest;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -144,7 +147,8 @@ namespace bodybykhoshalApi.Service
                        Content = c.Content,
                        Timestamp = c.Timestamp,
                        SenderName = c.SenderName,
-                       RoleId = c.RoleId
+                       RoleId = c.RoleId,
+                       ChatType = c.ChatType,
                      }).ToList();
 
         return chats;
@@ -280,7 +284,7 @@ namespace bodybykhoshalApi.Service
         var response = new BookinViewModel();
         var date = DateTime.ParseExact(request.Start, format, null);
 
-                var checkBookings = _dbContext.Booking.Where(x => x.StartDate.HasValue && x.StartDate.Value.Date == date.Date && x.UserId == request.UserId).Count();
+        var checkBookings = _dbContext.Booking.Where(x => x.StartDate.HasValue && x.StartDate.Value.Date == date.Date && x.UserId == request.UserId).Count();
         if (checkBookings >= 2 && request.Id == 0)
         {
           return response;
@@ -318,7 +322,7 @@ namespace bodybykhoshalApi.Service
 
           var cart = _dbContext.ShoppingCart.Where(x => x.UserId == request.UserId && x.StatusId == 2 && x.IsDeleted == false).FirstOrDefault();
           var bookingCount = _dbContext.Booking.Where(x => x.UserId == request.UserId && x.ShoppingCartId == cart.ShoppingCartId).Count();
-          
+
           if (cart != null && cart.TotalSessions > 0 && bookingCount < cart.TotalSessions)
           {
             request.ShoppingCartId = cart.ShoppingCartId;
@@ -350,44 +354,45 @@ namespace bodybykhoshalApi.Service
       }
 
     }
-        public PackagesViewModel GetCustomerPackage(string userGuid)
+    public PackagesViewModel GetCustomerPackage(string userGuid)
+    {
+      try
+      {
+        var package = new PackagesViewModel();
+        var cart = _dbContext.ShoppingCart.Where(x => x.UserId == userGuid && (x.StatusId == 2 || x.StatusId == 1)).FirstOrDefault();
+        if (cart != null)
         {
-            try
-            {
-                var package = new PackagesViewModel();
-                var cart = _dbContext.ShoppingCart.Where(x => x.UserId == userGuid && (x.StatusId == 2 || x.StatusId == 1)).FirstOrDefault();
-                if (cart != null)
-                {
-                    package = (from sc in _dbContext.ShoppingCart
-                                   join p in _dbContext.Packages on sc.PackageId equals p.PackagesId
-                                   where cart.ShoppingCartId == sc.ShoppingCartId && sc.IsDeleted == false
-                                   select new PackagesViewModel
-                                   {
-                                       Description = p.Description,
-                                       PackagesId = p.PackagesId,
-                                       PricePerSession = p.PricePerSession,
-                                       TotalNumberOfSessions = p.TotalNumberOfSessions,
-                                       TotalPrice = p.TotalPrice,
-                                       CreatedDate = p.CreatedDate,
-                                       IsDeleted = p.IsDeleted,
-                                       OrderId = p.OrderId,
-                                       PackageName = p.PackageName,
-                                       UserId = p.UserId,
-                                       StatusId = sc.StatusId,
-                                       TotalSessions = sc.TotalSessions,
-                                   }).FirstOrDefault();
-                } else
-                {
-                    package.StatusId = 0;
-                }
-                
-                return package;
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
+          package = (from sc in _dbContext.ShoppingCart
+                     join p in _dbContext.Packages on sc.PackageId equals p.PackagesId
+                     where cart.ShoppingCartId == sc.ShoppingCartId && sc.IsDeleted == false
+                     select new PackagesViewModel
+                     {
+                       Description = p.Description,
+                       PackagesId = p.PackagesId,
+                       PricePerSession = p.PricePerSession,
+                       TotalNumberOfSessions = p.TotalNumberOfSessions,
+                       TotalPrice = p.TotalPrice,
+                       CreatedDate = p.CreatedDate,
+                       IsDeleted = p.IsDeleted,
+                       OrderId = p.OrderId,
+                       PackageName = p.PackageName,
+                       UserId = p.UserId,
+                       StatusId = sc.StatusId,
+                       TotalSessions = sc.TotalSessions,
+                     }).FirstOrDefault();
         }
+        else
+        {
+          package.StatusId = 0;
+        }
+
+        return package;
+      }
+      catch (Exception)
+      {
+
+        throw;
+      }
+    }
   }
 }

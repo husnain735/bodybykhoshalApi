@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static bodybykhoshalApi.Models.ViewModel.HttpRequest;
+using System.Net.Http.Headers;
 
 namespace bodybykhoshalApi.Controllers
 {
@@ -122,14 +123,35 @@ namespace bodybykhoshalApi.Controllers
       var user = _homeService.saveCustomerBooking(request);
       return Ok(user);
     }
-        [Authorize]
-        [HttpGet("GetCustomerPackage")]
-        public IActionResult GetCustomerPackage()
-        {
-            var userClaim = getClaims();
-            var UserGUID = userClaim.UserGUID;
-            var packages = _homeService.GetCustomerPackage(UserGUID);
-            return Ok(packages);
-        }
+    [Authorize]
+    [HttpGet("GetCustomerPackage")]
+    public IActionResult GetCustomerPackage()
+    {
+      var userClaim = getClaims();
+      var UserGUID = userClaim.UserGUID;
+      var packages = _homeService.GetCustomerPackage(UserGUID);
+      return Ok(packages);
     }
+    [Authorize]
+    [Route("UploadChat")]
+    [HttpPost, DisableRequestSizeLimit]
+    public IActionResult UploadChat()
+    {
+      var file = Request.Form.Files[0];
+      var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+      var path = Path.Combine(Directory.GetCurrentDirectory(), "chatImages");
+      var url = path;
+      bool exists = Directory.Exists(url);
+      if (!exists)
+      {
+        Directory.CreateDirectory(url);
+      }
+      var fullPath = Path.Combine(url, fileName);
+      using (var stream = new FileStream(fullPath, FileMode.Create))
+      {
+        file.CopyTo(stream);
+      }
+      return Ok("chatImages/" + fileName);
+    }
+  }
 }

@@ -3,6 +3,7 @@ using bodybykhoshalApi.IService;
 using bodybykhoshalApi.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -64,6 +65,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.UseCors();
+app.UseStaticFiles(new StaticFileOptions
+{
+  FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "chatImages")),
+  RequestPath = "/chatImages"
+});
 app.Use((context, next) =>
 {
     if (context.Request.Method == "OPTIONS")
