@@ -15,5 +15,6 @@ namespace bodybykhoshalApi.Models.Entities
         public int RoleId { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string? GoogleCalendarToken { get; set; }
     }
 }
